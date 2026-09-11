@@ -65,13 +65,9 @@
                 <div class="card text-center col-md-8" style=" box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);">
                     <h5 class="card-header">Nearest Dispatched Order</h5>
                     <div class="card-body">
-                        <p class="card-text">
-                            @livewireStyles
+                        <div class="w-100">
                             @livewire('dashboard.nearest-dispatched-order')
-                            @livewireScripts
-                            @stack('scripts') 
-                            <!-- Include the custom scripts -->
-                        </p>
+                        </div>
                     </div>
                 </div>
             </div>

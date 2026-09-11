@@ -15,6 +15,8 @@
             @endif
         });
     </script>
+    @livewireScripts
+    @stack('scripts')
 </body>
 <script src="{{ asset('js/script.js')}}"></script>
 </html>

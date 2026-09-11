@@ -53,7 +53,7 @@
                         </ul>
                     </div>
                 @endif
-                <form method="POST" action="{{url('user/login')}}">
+                <form method="POST" action="{{route('login')}}">
                 @csrf
                     <!-- Username Field -->
                     <div class="mb-3">

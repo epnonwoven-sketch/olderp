@@ -124,7 +124,7 @@
       transform: card.style.transform
     }));
 
-    cards.forEach(card => {
+    cards.forEach((card, index) => {
       // On click, bring the card to the front
       card.addEventListener('click', () => {
         cards.forEach(c => c.style.zIndex = 1); // Reset all cards' z-index

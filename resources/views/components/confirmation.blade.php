@@ -42,7 +42,7 @@
     }
 
     $(document).ready(function(){
-      let modelInfo = {};
+      let modalZIndexStore = {};
       let modalZIndex = 1050; // Define the z-index value here or dynamically
 
       $('#confirmModal').on('show.bs.modal', function() {
@@ -51,7 +51,7 @@
               if (modal.attr('id') !== 'confirmModal') {
                   // Store the z-index of each modal except 'confirmModal'
                   let zIndex = modal.css('z-index');
-                  modelInfo[modal.attr('id')] = zIndex;
+                  modalZIndexStore[modal.attr('id')] = zIndex;
                   modal.css('z-index', parseInt(zIndex)-10); // Set a lower z-index to all other modals
               }
           });
@@ -60,9 +60,9 @@
       $('#confirmModal').on('hidden.bs.modal', function() {
           $('.modal').each(function() {
               let modal = $(this);
-              let zIndex = modelInfo[modal.attr('id')];
+              let zIndex = modalZIndexStore[modal.attr('id')];
               if (zIndex) {
-                  // Restore the original z-index from modelInfo
+                  // Restore the original z-index from modalZIndexStore
                   modal.css('z-index', zIndex);
               }
           });

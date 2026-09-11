@@ -267,7 +267,7 @@
 
         
     </script>
- 
+    @livewireStyles
 </head>
 <x-confirmation />
 <body>
@@ -292,10 +292,31 @@
             use Illuminate\Support\Facades\Redis;
 
             $user = auth()->user();
-            try {
-                $menuList = json_decode(Redis::get("menu_list_" . $user["user_type_id"]), true);
-            } catch (Exception $e) {
-                $menuList = null;
+            $menuList = null;
+            if ($user) {
+                try {
+                    $menuList = json_decode(Redis::get("menu_list_" . $user["user_type_id"]), true);
+                } catch (\Exception $e) {
+                    $menuList = null;
+                }
+                if (!$menuList) {
+                    try {
+                        $pemitedMenu = $user->getMenuList()->get();
+                        $menuId = $pemitedMenu->unique("menu_master_id")->pluck("menu_master_id");
+                        $menus = \App\Models\MenuMaster::whereIn("id", $menuId)
+                                                        ->where("lock_status", false)
+                                                        ->get();
+                        $treeData = (new \App\Http\Controllers\MenuController())->generateMenuTree($menus);
+                        $menuList = json_decode(json_encode($treeData), true);
+                        try {
+                            Redis::set("menu_list_" . $user["user_type_id"], json_encode($treeData));
+                        } catch (\Exception $ex) {
+                            // Ignore Redis save error
+                        }
+                    } catch (\Exception $ex) {
+                        $menuList = null;
+                    }
+                }
             }
             $tree = mapTree($menuList, 0);
             echo ($tree);
