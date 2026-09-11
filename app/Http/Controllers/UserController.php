@@ -62,12 +62,12 @@ class UserController extends Controller
                 $validate = Validator::make($request->all(),
                     [
                         'email' => 'required|email',
-                        'password' => 'required|confirmed',
+                        'password' => 'required',
                     ]
                     );
-                if($validate->failed()){                    
+                if($validate->fails()){
                     return redirect()->back()
-                        ->withErrors($validate->failed())
+                        ->withErrors($validate)
                         ->withInput();
                 }
                 
@@ -83,16 +83,20 @@ class UserController extends Controller
 
                     
                     if (Auth::attempt($credentials)) {
-                        $menuList ="";Redis::get("menu_list_".$user["user_type_id"]);                        
-                        if (!$menuList) {
-                            $pemitedMenu = $user->getMenuList()->get();
-                            
-                            $menuId = $pemitedMenu->unique("menu_master_id")->pluck("menu_master_id");
-                            $menus = $this->_M_MenuMaster->whereIn("id",$menuId)
-                                                            ->where("lock_status",false)
-                                                            ->get();                                        
-                            $tree = (new MenuController())->generateMenuTree($menus); 
-                            Redis::set("menu_list_".$user["user_type_id"],$tree);
+                        try {
+                            $menuList = Redis::get("menu_list_".$user["user_type_id"]);
+                            if (!$menuList) {
+                                $pemitedMenu = $user->getMenuList()->get();
+
+                                $menuId = $pemitedMenu->unique("menu_master_id")->pluck("menu_master_id");
+                                $menus = $this->_M_MenuMaster->whereIn("id",$menuId)
+                                                                ->where("lock_status",false)
+                                                                ->get();
+                                $tree = (new MenuController())->generateMenuTree($menus);
+                                Redis::set("menu_list_".$user["user_type_id"],$tree);
+                            }
+                        } catch (Exception $e) {
+                            // Redis unavailable: skip menu caching, login still succeeds.
                         }
                         session(['last_activity' => Carbon::now()]);
                         flashToast("message","Login");

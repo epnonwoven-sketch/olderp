@@ -292,7 +292,11 @@
             use Illuminate\Support\Facades\Redis;
 
             $user = auth()->user();
-            $menuList = json_decode(Redis::get("menu_list_" . $user["user_type_id"]), true);
+            try {
+                $menuList = json_decode(Redis::get("menu_list_" . $user["user_type_id"]), true);
+            } catch (Exception $e) {
+                $menuList = null;
+            }
             $tree = mapTree($menuList, 0);
             echo ($tree);
             ?>
