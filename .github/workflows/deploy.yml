@@ -1,0 +1,57 @@
+name: Deploy Evergreen App On server
+
+on:
+  push:
+    branches:
+      - main  # Change this if using another branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t techiemithlesh/evergreen-app:latest .
+          docker push techiemithlesh/evergreen-app:latest
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        if: success()
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "Switching to project directory..."
+            cd ~/evegreen || { echo "Directory not found!"; exit 1; }
+
+            echo "Pulling latest changes..."
+            git pull origin main
+
+            echo "Stopping existing containers..."
+            docker-compose down
+
+            echo "Cleaning up old images..."
+            docker system prune -af --volumes
+
+            echo "Pulling latest image..."
+            docker pull techiemithlesh/evergreen-app:latest
+
+            echo "Restarting Docker Compose..."
+            docker-compose up -d --force-recreate --build
+
+            echo "Running Laravel optimizations..."
+            docker-compose exec -T app php artisan cache:clear
+            docker-compose exec -T app php artisan config:clear
+            docker-compose exec -T app php artisan view:clear
+            docker-compose exec -T app php artisan route:clear
+            docker-compose exec -T app php artisan optimize
+
+            echo "Deployment complete! Your app is live at http://${{ secrets.SERVER_HOST }}"

@@ -1,0 +1,514 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    overflow-y: hidden;
+}
+.p-3{
+    padding: 1rem 0 !important;
+}
+
+h1 {
+    font-weight: 800;
+}
+
+li {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+.main {
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background-color: #f9f9f9;
+}
+
+#sidebar {
+    max-width: 264px;
+    min-width: 264px;
+    transition: all 0.35s ease-in-out;
+    background-color: #000;
+    display: flex;
+    flex-direction: column;
+}
+
+#sidebar.collapsed {
+    margin-left: -264px;
+}
+
+.toggler-btn {
+    background-color: transparent;
+    cursor: pointer;
+    border: 0;
+}
+
+.toggler-btn i {
+    font-size: 1.75rem;
+    color: #000;
+    font-weight: 1000;
+}
+
+.navbar {
+    padding: 1.15rem 1.5rem;
+    /* border-bottom: 2px dashed #b3a8a8; */
+}
+
+.sidebar-nav {
+    flex: 1 1 auto;
+}
+
+.sidebar-logo {
+    padding: 1.15rem 1.5rem;
+    text-align: center;
+}
+
+.sidebar-logo a {
+    color: #FFF;
+    font-weight: 800;
+    font-size: 1.5rem;
+}
+
+.sidebar-header {
+    color: #FFF;
+    font-size: .75rem;
+    padding: 1.5rem 1.5rem .375rem;
+}
+
+a.sidebar-link {
+    padding: .625rem 1.625rem;
+    color: #FFF;
+    position: relative;
+    transition: all 0.35s;
+    display: block;
+    font-size: 1rem;
+}
+
+a.sidebar-link:hover {
+    background-color: #f9f6f630;
+}
+
+.sidebar-link[data-bs-toggle="collapse"]::after {
+    border: solid;
+    border-width: 0 .075rem .075rem 0;
+    content: "";
+    display: inline-block;
+    padding: 2px;
+    position: absolute;
+    right: 1.5rem;
+    top: 1.4rem;
+    transform: rotate(-135deg);
+    transition: all .2s ease-out;
+}
+
+.sidebar-link[data-bs-toggle="collapse"].collapsed::after {
+    transform: rotate(45deg);
+    transition: all .2s ease-out;
+}
+
+.active-link{
+    background-color: #f9f6f630;
+}
+
+/* Screen size less than 768px */
+
+@media (max-width:768px) {
+
+    .sidebar-toggle {
+        margin-left: -264px;
+    }
+
+    #sidebar.collapsed {
+        margin-left: 0;
+    }
+    .container{
+        max-width: 100%;
+    }
+}
+
+@media(min-width: 1400px){
+    .container{
+        max-width: 1524px;
+    }
+}
+
+/* Navbar Styling */        
+.error {
+    color: red;
+}
+.error-text{
+    color: red;
+}
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(130deg, rgb(92 120 159) 0%, rgba(22, 9, 121, 1) 35%, rgb(92 120 159) 100%);
+    /* background-color: #3366ff; */
+    /* Matches the blue color */
+    padding: 0.5rem 1rem;
+}
+
+.navbar-left {
+    display: flex;
+    background :linear-gradient(130deg, rgb(92 120 159) 0%, rgba(22, 9, 121, 1) 35%, rgb(92 120 159) 100%);
+    align-items: center;
+    font-size: small;
+}
+
+.navbar-title {
+    flex-grow: 1;
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.navbar-icons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    /* Spacing between icons */
+}
+
+.navbar-icons a {
+    text-decoration: none;
+    color: white;
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.navbar-icons a:hover {
+    transform: scale(1.1);
+    /* Slight zoom on hover */
+}
+
+.panel-control {
+    text-align: right;
+}
+
+#page-head {
+    font-size: x-small;
+}
+.panel-heading{
+    background-color: #3193c7;
+    padding: 10px;
+    border-radius: 5px;
+}
+.panel-control {
+    height: 100%;
+    position: relative;
+    /* float: right; */
+    /* margin-top: -40px; */
+    padding: 0 15px 0 5px;
+}
+
+.panel-heading {
+    background-color: #3193c7;
+    padding: 10px;
+    border-radius: 5px;
+
+    /* Flexbox for alignment */
+    display: flex;
+    justify-content: space-between; /* Push title to the left, button to the right */
+    align-items: center; /* Vertically center items */
+}
+
+.panel-control {
+    display: flex;
+    align-items: center; /* Ensure the button aligns vertically */
+    padding: 0 15px 0 5px;
+}
+.panel-control > * {
+    margin-right: 10px; /* Adjust the value as needed */
+}
+
+/* Remove margin from the last child to avoid extra spacing */
+.panel-control > *:last-child {
+    margin-right: 0;
+}
+.panel-body{
+    padding: 35px 20px 25px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+    overflow-x: auto;
+    margin: 10px 0px;
+
+}
+.container {
+    overflow-x: auto; /* Enable horizontal scrolling */
+    /* white-space: nowrap; Prevent line breaks */
+    flex: 1; /* Expand to fill available space */
+    scroll-behavior: smooth; /* Smooth scrolling effect */
+    background-color: #fff;
+    border-radius: 3px;
+    margin-top: 20px;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 1rem;
+}
+
+.concontainer {
+    margin-top: 2 px;
+    padding: auto;
+}
+/* Custom Toastr Colors */
+.toast-success {
+    background-color: #28a745 !important;
+    color: #fff !important;
+}
+.toast-error {
+    background-color: #dc3545 !important;
+    color: #fff !important;
+}
+.toast-info {
+    background-color: #17a2b8 !important;
+    color: #fff !important;
+}
+.toast-warning {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+.toast-close-button {
+    color: #fff !important;
+}
+.toast-progress {
+    background-color: rgba(255, 255, 255, 0.7);
+}
+.dropdown-toggle::after {
+    display: none !important;
+}
+.dropdown-item-sm{
+    font-size: small !important;
+} 
+.tr-client td{
+    /* background-color: #5da907  !important;
+    color: rgba(255, 255, 255, 0.9) !important; */
+}
+.tr-printed td{
+    background-color: #2ed825 !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+.tr-client-printed td{
+    background-color: #43bc80 !important;
+    color: rgba(255, 255, 255, 0.9)!important;
+}
+.tr-primary-print td{
+    background-color: #ddf572 !important;
+    color: rgba(255, 255, 255, 0.9)!important;
+}
+.tr-argent-print td{
+    background-color: #f49146 !important;
+    color: rgba(255, 255, 255, 0.9)!important;
+}
+.tr-expiry-print td{
+    background-color: #f63b3b !important;
+    color: rgba(255, 255, 255, 0.9)!important;
+}
+.tr-gsm_variation_danger td{
+    background-color: #e01111 !important;
+    color: rgba(255, 255, 255, 0.9)!important;
+    font-weight: bolder;
+}
+.tr-gsm_variation td{
+    background-color: #f49146 !important;
+    color: rgba(255, 255, 255, 0.9)!important;
+    font-weight: bolder;
+}
+@keyframes blink {
+    0%, 100% {
+    opacity: 1;
+    }
+    50% {
+    opacity: 0.2;
+    }
+}
+
+.blink {
+    animation: blink 2.5s infinite; /* Blinks every second */
+}
+.color-box {
+    width: 50px;
+    height: 20px;
+    margin: auto;
+}
+
+.dropdownSearch {
+    /* position: absolute; */
+    z-index: 999;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: none;
+    max-height: 150px !important;
+    overflow-y: auto;
+    box-sizing: border-box;
+    width: 100% !important;
+    height : 150px !important;
+}
+
+.dropdownSearch.open {
+    display: block;
+    z-index: 1050;
+}
+
+.dropdownSearch div {
+    /* padding: 8px; */
+    cursor: pointer;
+}
+
+.dropdownSearch div:hover {
+    background-color: #f0f0f0;
+}
+
+.search-input {
+    box-sizing: border-box;
+    display: none;
+    margin-bottom: 5px;
+    width: 100% !important;
+    height: 2.5rem !important;
+
+}
+
+/* move element  */
+
+.movable {
+    position: absolute;
+    cursor: grab;
+    background-color: #3a3838;
+    padding: 10px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    border-radius: 8px;
+    transition: height 0.3s ease, padding 0.3s ease;
+
+    top: 50px; /* Adjust vertical position */
+    right: 10px; /* Move it to the right side */
+    width: 200px;
+    padding: 10px;
+
+}
+
+.movable.collapsed {
+    height: 40px; /* Height for the header only */
+    padding: 0 10px;
+    overflow: hidden;
+}
+
+.movable .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    height: 100%; /* Ensure the header fills the height in collapsed state */
+}
+
+.movable .header .icons {
+    font-size: 18px;
+    cursor: pointer;
+}
+.header{
+    border-bottom:2px solid #3a3838;
+}
+.content{
+    max-height: 600px;
+}
+.movable .content {
+    margin-top: 10px;
+    display: block;
+    overflow-x: auto;
+    overflow-y: auto;
+    margin: 10px 0px;
+}
+
+.hidden {
+    display: none;
+}
+
+.example-box {
+    background-color: lightblue;
+    border-radius: 8px;
+    padding: 10px;
+
+    padding: 35px 20px 25px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+
+}
+
+.table-fixed {
+    font-size: small !important;
+}
+
+.table-fixed td, .table-fixed th { /* Corrected the selector */
+    width: 100px; /* Adjust width as needed */
+    word-wrap: break-word;
+    white-space: normal; /* Allow text to wrap */
+    overflow: hidden; /* Prevent content overflow */
+    text-overflow: ellipsis; /* Show "..." for overflowed text */
+    padding: 8px; /* Optional: Add padding for better readability */
+    border: 1px solid #ddd; /* Optional: Add a border for clarity */
+    text-align: left;
+    text-align: center;
+    /* min-width: 50% */
+}
+
+.table-fixed td {
+    white-space: nowrap;
+    text-overflow: ellipsis; /* Adds "..." if text is too long */
+    
+}
+
+.select2-container {
+    display: block;
+}
+thead {
+    position: sticky;
+    top: 0;
+}
+
+form label{
+    font-weight: bolder;
+}
+
+.table-fixed td button, .table-fixed td span button{
+    margin-right: 5px;
+}
+.tableStickyDiv {
+    overflow-y: auto;
+    max-height: 100vh;
+    position: relative; 
+    scrollbar-width: none; /* Firefox */
+}
+
+.tableStickyDiv::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+}
+
+.tableStickyDiv tbody td:first-child, .tableStickyDiv thead th:first-child {
+    position: sticky;
+    left: 0;
+    background: white; /* Ensure it doesn't get hidden */
+    z-index: 2; /* Keeps it above other elements */
+}
+
+.tableStickyDiv thead {
+    position: sticky;
+    top: 0;
+    background: white; /* Prevent content overlap */
+    z-index: 4; /* Higher than first column */
+}
+
+  
+
+  /* end */
+
+
+
+
+
+
