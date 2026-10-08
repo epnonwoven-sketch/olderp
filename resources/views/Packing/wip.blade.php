@@ -246,10 +246,20 @@
         let valueObj = item?.valueObject;
  
         let is_piece = item.units === 'Piece'?true:false;
-        let colspan = 2;
-        let td = `<td> <input type='text' class="form-control bag_sl_no" style="width:100px" name='roll[${sl}][sl_no]' value="${packing_sl}" required onkeypress="return isNum(event);" placeholder="Sl No."  /></td>`;
+        let dateParts = packingDate.split("-");
+        let packingPrefix = dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0].slice(-2) + "-";
+        let serialText = String(packing_sl).padStart(2, "0");
+        let packingNo = packingPrefix + serialText;
+        let td = `<td>
+                    <input type="text" class="form-control bag_sl_no" style="width:70px" id="roll_${sl}_sl_no" name="roll[${sl}][sl_no]" value="${packing_sl}" required onkeypress="return isNum(event);" onkeyup="updatePackingNo(${sl})" placeholder="Sl No." />
+                </td>
+                <td>
+                    <input type="text" class="form-control" style="width:140px" id="roll_${sl}_packing_no" value="${packingNo}" data-prefix="${packingPrefix}" readonly />
+                </td>
+                <td>
+                    <input type="text" class="form-control" style="width:90px" name="roll[${sl}][suffix]" maxlength="3" placeholder="Mark" oninput="this.value=this.value.replace(/[^A-Za-z]/g,'').toUpperCase().slice(0,3)" />
+                </td>`;
         if(is_piece){
-            colspan=0;
             td+=` 
                 <td>
                     <input data-id="${sl}" type='text' class="form-control" style="width:100px" placeholder="Piece" id='roll_${sl}_pieces' name='roll[${sl}][pieces]' ${item.units === 'Piece' ? 'required' : ''} onkeypress="return isNumDot(event);" onkeyup="calculateIdealWeight(event,${id})" />
@@ -261,7 +271,7 @@
             `;
         }
         td+=`
-                <td colspan='${colspan}'>
+                <td>
                     <input type='hidden' name='roll[${sl}][id]' value='${item.id}' />
                     <input type='text' class="form-control" style="width:100px" placeholder="Weight" id='roll_${sl}_weight' name='roll[${sl}][weight]' required onkeypress="return isNumDot(event);" onkeyup="addColorInput(${sl})" />
                     <span class="error-text" id="roll_${sl}_weight-error"></span>
@@ -275,6 +285,13 @@
         table.find("tbody").append(tr);
         table.show();
         $("#submit").show();
+    }
+
+    function updatePackingNo(rowSl) {
+        let prefix = $("#roll_" + rowSl + "_packing_no").attr("data-prefix") || "";
+        let serial = $("#roll_" + rowSl + "_sl_no").val();
+        let serialText = serial === "" ? "" : String(serial).padStart(2, "0");
+        $("#roll_" + rowSl + "_packing_no").val(prefix + serialText);
     }
 
     function removeTr(element, id) {

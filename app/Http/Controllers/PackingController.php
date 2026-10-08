@@ -84,7 +84,6 @@ class PackingController extends Controller
     public function WIPVerification(Request $request){
         if($request->ajax())
         {
-            DB::enableQueryLog();
             $data = $this->_M_OrderPunchDetail
             ->select(DB::raw("order_punch_details.*,client_detail_masters.client_name,bag_type_masters.bag_type,
                             COALESCE(roll_weight,0) as roll_weight,
@@ -131,8 +130,18 @@ class PackingController extends Controller
             ->where("order_punch_details.is_draft",false)
             // ->where("order_punch_details.id",261)
             ->orderBy("order_punch_details.id")
-            ->get()
-            ->map(function($val){   
+            ->get();
+            $rollIds = $data->flatMap(function ($val) {
+                return array_filter(explode(",", (string) $val->roll_ids));
+            })->unique()->values();
+            $rollsById = $rollIds->isEmpty()
+                ? collect()
+                : $this->_M_RollDetail->whereIn("id", $rollIds)->get()->keyBy("id");
+            $bagTypeIds = $rollsById->pluck("bag_type_id")->merge($data->pluck("bag_type_id"))->filter()->unique()->values();
+            $bagTypes = $bagTypeIds->isEmpty()
+                ? collect()
+                : $this->_M_BagType->whereIn("id", $bagTypeIds)->get()->keyBy("id");
+            $data = $data->map(function($val) use ($rollsById, $bagTypes){
                 $val->bora_weight_in_kg = $val->bora_weight/1000;         
                 $gsm_json = $val->bag_gsm;
                 $val->alt_bag_gsm = collect(json_decode($val->alt_bag_gsm,true))->implode(",");
@@ -145,10 +154,12 @@ class PackingController extends Controller
                 $val->bag_size = (float)$val->bag_w." x ".(float)$val->bag_l.($val->bag_g ?(" x ".(float)$val->bag_g) :"") ;
                 
                 $val->loop_weight = 0;
-                $rolls = $this->_M_RollDetail->whereIn("id",explode(",",$val->roll_ids))->get();
+                $rolls = collect(explode(",", (string) $val->roll_ids))->filter()->map(function ($id) use ($rollsById) {
+                    return $rollsById->get($id);
+                })->filter();
                 $totalPieces =0;
                 foreach($rolls as $roll){                    
-                    $bag = $this->_M_BagType->find($roll->bag_type_id);
+                    $bag = $bagTypes->get($roll->bag_type_id);
                     $formula = $bag->roll_find;
                     $formula2 = $bag->roll_find_as_weight;
 
@@ -176,7 +187,7 @@ class PackingController extends Controller
                     $result2 = $this->calculatePossibleProduction($newRequest2);
                     $totalPieces += ((($result["result"]??0)+($result2["result"]??0))/2);
                 }
-                $oneKg = $totalPieces/$val->roll_weight;
+                $oneKg = $val->roll_weight ? ($totalPieces/$val->roll_weight) : 0;
                 $garbagePec = $oneKg * $val->total_garbage;
                 $totalProductPieces = round($totalPieces - $garbagePec);                
                 $val->total_pieces =  $totalProductPieces ;
@@ -199,8 +210,9 @@ class PackingController extends Controller
                 $val->balance_prc =  $val->int_balance." %";
                 $gsm = collect(json_decode($gsm_json,true));
                 $rs = Config::get("customConfig.BagTypeIdealWeightFormula.".$val->bag_type_id)["RS"]??"";                
-                $val->formula_ideal_weight = $this->_M_BagType->find($val->bag_type_id)->weight_of_bag_per_piece;                
-                $val->weight_per_bag = ($val->roll_weight + $val->loop_weight - $val->total_garbage - $uCuteGarbage )/$val->total_pieces;
+                $bagType = $bagTypes->get($val->bag_type_id);
+                $val->formula_ideal_weight = $bagType->weight_of_bag_per_piece ?? "";
+                $val->weight_per_bag = $val->total_pieces ? (($val->roll_weight + $val->loop_weight - $val->total_garbage - $uCuteGarbage )/$val->total_pieces) : 0;
                 
                 return $val;
 
@@ -351,6 +363,17 @@ class PackingController extends Controller
     
                     },
                 ],
+                "roll.*.suffix"=> [
+                    "nullable",
+                    function ($attribute, $value, $fail) {
+                        if ($value === null || $value === "") {
+                            return;
+                        }
+                        if (!preg_match('/^[A-Za-z]{1,3}$/', $value)) {
+                            $fail("Mark must be up to 3 letters.");
+                        }
+                    },
+                ],
             ];
             
             $validate = Validator::make($request->all(),$rules);
@@ -359,13 +382,19 @@ class PackingController extends Controller
             }
             $user = Auth()->user();
             DB::beginTransaction();
+            $usedPackingNos = [];
             foreach(collect($request->roll)->sortBy("sl_no") as $val){
                 $newRequest = new Request();
                 $orderDate = Carbon::parse($request->packing_date);
                 $rolNo = $orderDate->clone()->format("d/m/y")."-";
                 $sl = $val["sl_no"];
                 $slNo =str_pad((string)$sl,2,"0",STR_PAD_LEFT);
-                $rolNo.=$slNo;
+                $suffix = strtoupper(trim((string)($val["suffix"] ?? "")));
+                $rolNo.=$slNo.$suffix;
+                if(isset($usedPackingNos[$rolNo])){
+                    throw new Exception("Bora No ".$rolNo." Already Exist Please Enter Next");
+                }
+                $usedPackingNos[$rolNo] = true;
                 $test = BagPacking::where("packing_no",$rolNo)->count();
                 if(($test)){ 
                     throw new Exception("Bora No ".$rolNo." Already Exist Please Enter Next");
