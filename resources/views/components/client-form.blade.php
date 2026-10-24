@@ -11,68 +11,78 @@
                     @csrf
                     <!-- Hidden field for Client ID -->
                     <input type="hidden" id="id" name="id" value="">
-                    <input type="hidden" id="cityHidden"/>
+                    <input type="hidden" id="cityHidden" />
 
                     <div class="row mb-3">
                         <!-- Client Name -->
-                        <label class="control-label col-md-2" for="clientName">Client Name<span class="text-danger">*</span></label>
+                        <label class="control-label col-md-2" for="clientName">Client Name<span
+                                class="text-danger">*</span></label>
                         <div class="col-md-4">
-                            <input type="text" maxlength="100" id="clientName" name="clientName" class="form-control" placeholder="Enter Client Name" required>
+                            <input type="text" maxlength="100" id="clientName" name="clientName" class="form-control"
+                                placeholder="Enter Client Name" required>
                             <span class="error-text" id="clientName-error"></span>
                         </div>
-                        <label class="control-label col-md-2" for="stateId">State<span class="text-danger">*</span></label>
+                        <label class="control-label col-md-2" for="stateId">State<span
+                                class="text-danger">*</span></label>
                         <div class="col-md-4">
                             <select name="stateId" id="stateId" class="form-select" required>
                                 <option value="">select</option>
-                                @foreach($stateList as $val)
-                                <option value="{{$val->id}}">{{$val->state_name}}</option>
+                                @foreach ($stateList as $val)
+                                    <option value="{{ $val->id }}">{{ $val->state_name }}</option>
                                 @endforeach
                             </select>
                             <span class="error-text" id="stateId-error"></span>
                         </div>
                     </div>
 
-                    <div class="row mb-3"> 
-                        <label class="control-label col-md-2" for="cityId">City<span class="text-danger">*</span></label>
+                    <div class="row mb-3">
+                        <label class="control-label col-md-2" for="cityId">City<span
+                                class="text-danger">*</span></label>
                         <div class="col-md-4">
                             <select name="cityId" id="cityId" class="form-select" required>
                                 <option value="">select</option>
                             </select>
                             <span class="error-text" id="cityId-error"></span>
                         </div>
-                        
+
                         <!-- Client Address -->
-                        <label class="control-label col-md-2" for="address">Address<span class="text-danger">*</span></label>
+                        <label class="control-label col-md-2" for="address">Address<span
+                                class="text-danger">*</span></label>
                         <div class="col-md-4">
                             <textarea id="address" name="address" class="form-control" placeholder="Enter Client Address" rows="3" required></textarea>
                             <span class="error-text" id="address-error"></span>
                         </div>
 
-                        <label class="control-label col-md-3" for="hasAddressTwo">Has Multiple Address<span class="text-danger">*</span></label>
+                        <label class="control-label col-md-3" for="hasAddressTwo">Has Multiple Address<span
+                                class="text-danger">*</span></label>
                         <div class="col-md-3 form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="hasAddressTwo" name="hasAddressTwo" />
                             <div class="">
-                            </div>  
+                            </div>
                             <span class="error-text" id="hasAddressTwo-error"></span>
                         </div>
-                        
+
                     </div>
 
                     <div class="row mb-3">
-                        <label class="control-label col-md-2" for="sectorId">Sector<span class="text-danger">*</span></label>
+                        <label class="control-label col-md-2" for="sectorId">Sector<span
+                                class="text-danger">*</span></label>
                         <div class="col-md-4">
-                            <select type="text" id="sectorId" name="sectorId" class="form-select" placeholder="Enter state" required >
+                            <select type="text" id="sectorId" name="sectorId" class="form-select"
+                                placeholder="Enter state" required>
                                 <option value="">Select</option>
-                                @foreach($sector as $val)
-                                    <option value="{{$val->id}}">{{$val->sector}}</option>
+                                @foreach ($sector as $val)
+                                    <option value="{{ $val->id }}">{{ $val->sector }}</option>
                                 @endforeach
                             </select>
                             <span class="error-text" id="sectorId-error"></span>
                         </div>
                         <!-- Mobile Number -->
-                        <label class="control-label col-md-2" for="mobileNo">Mobile Number<span class="text-danger">*</span></label>
+                        <label class="control-label col-md-2" for="mobileNo">Mobile Number<span
+                                class="text-danger">*</span></label>
                         <div class="col-md-4">
-                            <input type="text" maxlength="15" id="mobileNo" name="mobileNo" class="form-control" placeholder="Enter Mobile Number" required onkeypress="return isNum(event);">
+                            <input type="text" maxlength="15" id="mobileNo" name="mobileNo" class="form-control"
+                                placeholder="Enter Mobile Number" required onkeypress="return isNum(event);">
                             <span class="error-text" id="mobileNo-error"></span>
                         </div>
                     </div>
@@ -80,12 +90,16 @@
                     <div class="row mb-3">
                         <label class="control-label col-md-2" for="secondaryMobileNo">Mobile Number 2</label>
                         <div class="col-md-4">
-                            <input type="text" maxlength="15" id="secondaryMobileNo" name="secondaryMobileNo" class="form-control" placeholder="Enter Secondary Mobile Number" onkeypress="return isNum(event);">
+                            <input type="text" maxlength="15" id="secondaryMobileNo" name="secondaryMobileNo"
+                                class="form-control" placeholder="Enter Secondary Mobile Number"
+                                onkeypress="return isNum(event);">
                             <span class="error-text" id="secondaryMobileNo-error"></span>
                         </div>
                         <label class="control-label col-md-2" for="temporaryMobileNo">Mobile Number 3</label>
                         <div class="col-md-4">
-                            <input type="text" maxlength="15" id="temporaryMobileNo" name="temporaryMobileNo" class="form-control" placeholder="Enter Temporary Mobile Number" onkeypress="return isNum(event);">
+                            <input type="text" maxlength="15" id="temporaryMobileNo" name="temporaryMobileNo"
+                                class="form-control" placeholder="Enter Temporary Mobile Number"
+                                onkeypress="return isNum(event);">
                             <span class="error-text" id="temporaryMobileNo-error"></span>
                         </div>
                     </div>
@@ -93,13 +107,52 @@
                         <!-- Client Email -->
                         <label class="control-label col-md-2" for="email">Email</label>
                         <div class="col-md-4">
-                            <input type="email" maxlength="100" id="email" name="email" class="form-control" placeholder="client@example.com">
+                            <input type="email" maxlength="100" id="email" name="email"
+                                class="form-control" placeholder="client@example.com">
                             <span class="error-text" id="email-error"></span>
                         </div>
                         <label class="control-label col-md-2" for="tradeName">Trade Name</label>
                         <div class="col-md-4">
-                            <input type="text" maxlength="100" id="tradeName" name="tradeName" class="form-control" placeholder="">
+                            <input type="text" maxlength="100" id="tradeName" name="tradeName"
+                                class="form-control" placeholder="">
                             <span class="error-text" id="tradeName-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label class="control-label col-md-2" for="paymentTerm">Payment Terms<span
+                                class="text-danger">*</span></label>
+                        <div class="col-md-4">
+                            <select name="paymentTerm" id="paymentTerm" class="form-select" required
+                                onchange="togglePaymentTermFields()">
+                                <option value="">Select</option>
+                                <option value="advance">Advance</option>
+                                <option value="credit">Credit</option>
+                                <option value="others">Others</option>
+                            </select>
+                            <span class="error-text" id="paymentTerm-error"></span>
+                        </div>
+                        <div class="col-md-6" id="creditDaysWrap" style="display:none;">
+                            <div class="row">
+                                <label class="control-label col-md-4" for="creditDays">Credit Days<span
+                                        class="text-danger">*</span></label>
+                                <div class="col-md-8">
+                                    <input type="text" id="creditDays" name="creditDays" class="form-control"
+                                        placeholder="Days" onkeypress="return isNum(event);">
+                                    <span class="error-text" id="creditDays-error"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="paymentTermNoteWrap" style="display:none;">
+                            <div class="row">
+                                <label class="control-label col-md-4" for="paymentTermNote">Others<span
+                                        class="text-danger">*</span></label>
+                                <div class="col-md-8">
+                                    <input type="text" maxlength="255" id="paymentTermNote"
+                                        name="paymentTermNote" class="form-control" placeholder="Payment terms">
+                                    <span class="error-text" id="paymentTermNote-error"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -116,33 +169,33 @@
 </div>
 
 <script>
-    $(document).ready(function(){
+    $(document).ready(function() {
         $("#stateId").select2({
-            width:"100%",                    
-            dropdownCssClass: 'form-control',            
+            width: "100%",
+            dropdownCssClass: 'form-control',
             dropdownParent: $('#clientModal'),
         });
         $("#cityId").select2({
-            width:"100%",                   
-            dropdownCssClass: 'form-control',            
+            width: "100%",
+            dropdownCssClass: 'form-control',
             dropdownParent: $('#clientModal'),
         });
-        $("#stateId").on("change",function(event,cityId=null){
+        $("#stateId").on("change", function(event, cityId = null) {
             stateId = event.target.value;
-            oldCity = cityId?cityId:$("#cityHidden").val();
-            $('#cityId').empty(); 
+            oldCity = cityId ? cityId : $("#cityHidden").val();
+            $('#cityId').empty();
             $('#cityId').append('<option value="">Select</option>');
-            if(stateId){
+            if (stateId) {
                 $.ajax({
-                    url:"{{route('master.city.by.state',':id')}}".replace(":id",stateId),
-                    type:"get",
-                    success:function(data){
-                        if(data?.status){
-                            $.each(data?.data, function (key, city) {
-                            $('#cityId').append(
-                                `<option value="${city.id}" ${city.id==oldCity?"selected":""}>${city.city_name}</option>`
-                            );
-                        });
+                    url: "{{ route('master.city.by.state', ':id') }}".replace(":id", stateId),
+                    type: "get",
+                    success: function(data) {
+                        if (data?.status) {
+                            $.each(data?.data, function(key, city) {
+                                $('#cityId').append(
+                                    `<option value="${city.id}" ${city.id==oldCity?"selected":""}>${city.city_name}</option>`
+                                );
+                            });
                         }
                     }
                 })
@@ -158,11 +211,24 @@
                 clientMobileNo: {
                     required: true,
                     number: true,
-                    minlength:10,
-                    minlength:10
+                    minlength: 10,
+                    minlength: 10
                 },
                 clientAddress: {
                     required: true,
+                },
+                paymentTerm: {
+                    required: true,
+                },
+                creditDays: {
+                    required: function() {
+                        return $("#paymentTerm").val() === "credit";
+                    },
+                },
+                paymentTermNote: {
+                    required: function() {
+                        return $("#paymentTerm").val() === "others";
+                    },
                 },
             },
             submitHandler: function(form) {
@@ -172,21 +238,33 @@
         addEventListenersToForm("clientForm");
     });
 
-    function addClint(){
+    function togglePaymentTermFields() {
+        let term = $("#paymentTerm").val();
+        $("#creditDaysWrap").toggle(term === "credit");
+        $("#paymentTermNoteWrap").toggle(term === "others");
+        if (term !== "credit") {
+            $("#creditDays").val("");
+        }
+        if (term !== "others") {
+            $("#paymentTermNote").val("");
+        }
+    }
+
+    function addClint() {
         $.ajax({
                 type: "POST",
-                'url':"{{route('client.add')}}",            
-                                
+                'url': "{{ route('client.add') }}",
+
                 "deferRender": true,
                 "dataType": "json",
                 'data': $("#clientForm").serialize(),
-                beforeSend: function () {
+                beforeSend: function() {
                     $("#loadingDiv").show();
                 },
-                success: function (data) {
+                success: function(data) {
                     $("#loadingDiv").hide();
                     console.log(data);
-                    if(data.status){
+                    if (data.status) {
                         $("#clientForm").get(0).reset();
                         $("#clientModal").modal('hide');
                         var newOptionValue = data?.data?.client?.id;
@@ -195,27 +273,36 @@
                             // Check if the option already exists
                             if ($('#forClientId option[value="' + newOptionValue + '"]').length === 0) {
                                 // Add the new option to the select list
-                                $('#forClientId').append('<option value="' + newOptionValue + '">' + clientName + '</option>');                                
-                            } 
+                                $('#forClientId').append('<option value="' + newOptionValue + '">' +
+                                    clientName + '</option>');
+                            }
                             if ($('#bookingForClientId option[value="' + newOptionValue + '"]').length === 0) {
-                                // Add the new option to the select list
-                                $('#bookingForClientId').append('<option value="' + newOptionValue + '">' + clientName + '</option>');                                
-                            } 
-                        } 
+                                let client = data?.data?.client || {};
+                                $('#bookingForClientId').append(
+                                    $('<option>', {
+                                        value: newOptionValue,
+                                        text: clientName,
+                                        'data-payment-term': client.payment_term || '',
+                                        'data-credit-days': client.credit_days || '',
+                                        'data-payment-term-note': client.payment_term_note || ''
+                                    })
+                                );
+                            }
+                        }
                         modelInfo(data.messages);
-                    }else if (data?.errors) {
+                    } else if (data?.errors) {
                         let errors = data?.errors;
                         modelInfo(data.message);
                         for (field in errors) {
                             console.log(field);
                             $(`#${field}-error`).text(errors[field][0]);
                         }
-                    }else{
+                    } else {
                         modelInfo("Something Went Wrong!!");
                     }
                 },
             }
 
-        ) 
+        )
     }
 </script>

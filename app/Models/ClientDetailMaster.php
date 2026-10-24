@@ -25,6 +25,9 @@ class ClientDetailMaster extends Model
         "secondary_mobile_no",
         "temporary_mobile_no",
         "has_address_two",
+        "payment_term",
+        "credit_days",
+        "payment_term_note",
         'lock_status',
     ];
 
@@ -60,5 +63,18 @@ class ClientDetailMaster extends Model
     }
     public function getSector(){
         return $this->belongsTo(Sector::class,"sector_id","id")->first();
+    }
+
+    public function paymentTermLabel(){
+        if($this->payment_term==="advance"){
+            return "Advance";
+        }
+        if($this->payment_term==="credit"){
+            return "Credit ".($this->credit_days !== null && $this->credit_days !== "" ? $this->credit_days." days" : "");
+        }
+        if($this->payment_term==="others"){
+            return $this->payment_term_note ?: "Others";
+        }
+        return "";
     }
 }

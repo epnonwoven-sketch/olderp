@@ -129,7 +129,10 @@
             }
         } elseif (is_string($chalan_date) && preg_match('/^\d{2}[-\/]\d{2}[-\/]\d{4}/', $chalan_date)) {
             try {
-                $displayDate = \Carbon\Carbon::createFromFormat('d-m-Y', str_replace('/', '-', substr($chalan_date, 0, 10)))->format('d/m/Y');
+                $displayDate = \Carbon\Carbon::createFromFormat(
+                    'd-m-Y',
+                    str_replace('/', '-', substr($chalan_date, 0, 10)),
+                )->format('d/m/Y');
             } catch (\Exception $e) {
             }
         }
@@ -185,7 +188,8 @@
                         <td>{{ $item['bag_type'] }}</td>
                         <td>{{ $item['color'] }}</td>
                         <td>{{ $item['rate'] !== '' && $item['rate'] !== null ? $trimNum($item['rate']) : '' }}
-                            ({{ $unit }})</td>
+                            ({{ $unit }})
+                        </td>
                         <td>{{ $item['fare'] ?? '' }}</td>
                         <td>{{ $item['stereo'] ?? '' }}</td>
                     </tr>

@@ -49,6 +49,9 @@ class OrderPunchDetail extends Model
         "alt_bag_color",
         "alt_bag_gsm",
         "is_draft",
+        "payment_term",
+        "credit_days",
+        "payment_term_note",
     ];
 
     public function store($request){        
@@ -104,6 +107,19 @@ class OrderPunchDetail extends Model
 
     public function getStereo(){
         return $this->belongsTo(StereoDetail::class,"stereo_type_id","id")->first();
+    }
+
+    public function paymentTermLabel(){
+        if($this->payment_term==="advance"){
+            return "Advance";
+        }
+        if($this->payment_term==="credit"){
+            return "Credit ".($this->credit_days !== null && $this->credit_days !== "" ? $this->credit_days." days" : "");
+        }
+        if($this->payment_term==="others"){
+            return $this->payment_term_note ?: "Others";
+        }
+        return "";
     }
 
     public function getRollTransit(){
