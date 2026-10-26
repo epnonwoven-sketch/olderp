@@ -670,6 +670,7 @@ class PackingController extends Controller
                 $val->bag_type = $order->getBagType()->bag_type;
                 $val->bag_color = collect(json_decode($order->bag_color, true))->implode(",");
                 $val->bag_size = (float)$order->bag_w . " x " . (float)$order->bag_l . ($order->bag_g ? (" x " . (float)$order->bag_g) : "");
+                $val->bag_quality = $order->bag_quality ?? "";
                 $fare = $order->getFare();
                 $stereo = $order->getStereo();
                 $val->rate = $this->formatChalanRate($order->rate_per_unit);
@@ -683,7 +684,7 @@ class PackingController extends Controller
             $parentTable = [];
             $unitGroup = $bags->groupBy(["units"]);
             foreach ($unitGroup as $unit => $bb) {
-                $bagGroup = $bb->groupBy(["bag_type", "bag_color", "bag_size"]);
+                $bagGroup = $bb->groupBy(["bag_type", "bag_color", "bag_size", "bag_quality"]);
                 $table = [];
                 $table["grand_total"] = [
                     "total" => $bb->count(),
@@ -691,19 +692,22 @@ class PackingController extends Controller
                 ];
                 foreach ($bagGroup as $bagType => $colorSize) {
                     foreach ($colorSize as $color => $size) {
-                        foreach ($size as $key => $val) {
-                            $firstBag = collect($val)->first();
-                            $table["row"][] = [
-                                "bag_type" => $bagType,
-                                "color" => $color,
-                                "size" => $key,
-                                "rate" => $firstBag->rate ?? "",
-                                "fare" => $firstBag->fare ?? "",
-                                "stereo" => $firstBag->stereo ?? "",
-                                "bags" => $val->toArray(),
-                                "count" => collect($val)->count(),
-                                "total_unit" => $unit == "Kg" ? collect($val)->sum("packing_weight") : collect($val)->sum("packing_bag_pieces"),
-                            ];
+                        foreach ($size as $sizeKey => $qualityGroup) {
+                            foreach ($qualityGroup as $quality => $val) {
+                                $firstBag = collect($val)->first();
+                                $table["row"][] = [
+                                    "bag_type" => $bagType,
+                                    "color" => $color,
+                                    "size" => $sizeKey,
+                                    "roll_configuration" => $quality,
+                                    "rate" => $firstBag->rate ?? "",
+                                    "fare" => $firstBag->fare ?? "",
+                                    "stereo" => $firstBag->stereo ?? "",
+                                    "bags" => $val->toArray(),
+                                    "count" => collect($val)->count(),
+                                    "total_unit" => $unit == "Kg" ? collect($val)->sum("packing_weight") : collect($val)->sum("packing_bag_pieces"),
+                                ];
+                            }
                         }
                     }
                 }
@@ -827,7 +831,8 @@ class PackingController extends Controller
                 $fare = $bag["fare"] ?? "";
                 $stereo = $bag["stereo"] ?? "";
                 $size = $bag["bag_size"] ?? ($row["size"] ?? "");
-                $key = implode("|", [$size, $row["bag_type"] ?? "", $row["color"] ?? "", $rate, $fare, $stereo]);
+                $quality = $bag["bag_quality"] ?? ($row["roll_configuration"] ?? "");
+                $key = implode("|", [$size, $row["bag_type"] ?? "", $row["color"] ?? "", $quality, $rate, $fare, $stereo]);
                 if (isset($seen[$key])) {
                     continue;
                 }
@@ -836,6 +841,7 @@ class PackingController extends Controller
                     "size" => $size,
                     "bag_type" => $row["bag_type"] ?? "",
                     "color" => $row["color"] ?? "",
+                    "roll_configuration" => $quality,
                     "rate" => $rate,
                     "fare" => $fare,
                     "stereo" => $stereo,
@@ -854,7 +860,7 @@ class PackingController extends Controller
         foreach ($data["table"] as $unitTable) {
             foreach ($unitTable["row"] ?? [] as $row) {
                 foreach ($row["bags"] ?? [] as $bag) {
-                    if (!array_key_exists("rate", $bag) && !empty($bag["order_id"])) {
+                    if (!empty($bag["order_id"])) {
                         $orderIds[] = $bag["order_id"];
                     }
                 }
@@ -875,29 +881,70 @@ class PackingController extends Controller
             }
         }
         foreach ($data["table"] as $unit => $unitTable) {
-            foreach ($unitTable["row"] ?? [] as $rowIndex => $row) {
+            $rows = [];
+            foreach ($unitTable["row"] ?? [] as $row) {
                 foreach ($row["bags"] ?? [] as $bagIndex => $bag) {
-                    if (array_key_exists("rate", $bag)) {
-                        continue;
-                    }
                     $order = $orders->get($bag["order_id"] ?? null);
-                    $fare = $order ? $fares->get($order->fare_type_id) : null;
-                    $stereo = $order ? $stereos->get($order->stereo_type_id) : null;
-                    $bag["rate"] = $order ? $this->formatChalanRate($order->rate_per_unit) : "";
-                    $bag["fare"] = $fare->fare_type ?? "";
-                    $bag["stereo"] = $stereo->stereo_type ?? "";
-                    $data["table"][$unit]["row"][$rowIndex]["bags"][$bagIndex] = $bag;
+                    if (!array_key_exists("rate", $bag)) {
+                        $fare = $order ? $fares->get($order->fare_type_id) : null;
+                        $stereo = $order ? $stereos->get($order->stereo_type_id) : null;
+                        $bag["rate"] = $order ? $this->formatChalanRate($order->rate_per_unit) : "";
+                        $bag["fare"] = $fare->fare_type ?? "";
+                        $bag["stereo"] = $stereo->stereo_type ?? "";
+                    }
+                    if ($order) {
+                        $bag["bag_quality"] = $order->bag_quality ?? "";
+                    } elseif (!isset($bag["bag_quality"])) {
+                        $bag["bag_quality"] = $row["roll_configuration"] ?? "";
+                    }
+                    $row["bags"][$bagIndex] = $bag;
                 }
-                $bagsNow = $data["table"][$unit]["row"][$rowIndex]["bags"] ?? [];
+                $bagsNow = $row["bags"] ?? [];
                 $firstBag = $bagsNow ? reset($bagsNow) : [];
-                $data["table"][$unit]["row"][$rowIndex]["rate"] = $row["rate"] ?? ($firstBag["rate"] ?? "");
-                $data["table"][$unit]["row"][$rowIndex]["fare"] = $row["fare"] ?? ($firstBag["fare"] ?? "");
-                $data["table"][$unit]["row"][$rowIndex]["stereo"] = $row["stereo"] ?? ($firstBag["stereo"] ?? "");
+                $row["rate"] = $row["rate"] ?? ($firstBag["rate"] ?? "");
+                $row["fare"] = $row["fare"] ?? ($firstBag["fare"] ?? "");
+                $row["stereo"] = $row["stereo"] ?? ($firstBag["stereo"] ?? "");
+                $row["roll_configuration"] = $firstBag["bag_quality"] ?? ($row["roll_configuration"] ?? "");
+                $rows[] = $row;
             }
-            $data["table"][$unit]["summary"] = $this->chalanSizeSummary($data["table"][$unit]["row"] ?? []);
+            $rows = $this->splitChalanRowsByConfiguration($rows, $unit);
+            $data["table"][$unit]["row"] = $rows;
+            $data["table"][$unit]["summary"] = $this->chalanSizeSummary($rows);
         }
         $data["payment_terms"] = $this->paymentTermsForChalanData($data);
         return $data;
+    }
+
+    private function splitChalanRowsByConfiguration($rows, $unit)
+    {
+        $split = [];
+        foreach ($rows as $row) {
+            $groups = [];
+            foreach ($row["bags"] ?? [] as $bag) {
+                $quality = (string)($bag["bag_quality"] ?? ($row["roll_configuration"] ?? ""));
+                $groups[$quality][] = $bag;
+            }
+            if (count($groups) <= 1) {
+                $quality = array_key_first($groups);
+                $row["roll_configuration"] = $quality !== null ? $quality : ($row["roll_configuration"] ?? "");
+                $split[] = $row;
+                continue;
+            }
+            foreach ($groups as $quality => $bags) {
+                $copy = $row;
+                $copy["bags"] = array_values($bags);
+                $copy["roll_configuration"] = $quality;
+                $copy["count"] = count($bags);
+                $copy["rate"] = $bags[0]["rate"] ?? ($row["rate"] ?? "");
+                $copy["fare"] = $bags[0]["fare"] ?? ($row["fare"] ?? "");
+                $copy["stereo"] = $bags[0]["stereo"] ?? ($row["stereo"] ?? "");
+                $copy["total_unit"] = $unit == "Kg"
+                    ? collect($bags)->sum("packing_weight")
+                    : collect($bags)->sum("packing_bag_pieces");
+                $split[] = $copy;
+            }
+        }
+        return $split;
     }
 
     private function paymentTermsForOrders($orders, $fallbackClient = null)

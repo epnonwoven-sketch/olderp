@@ -176,6 +176,7 @@
                     <th>Bag size</th>
                     <th>Bag type</th>
                     <th>colour</th>
+                    <th>Roll Type</th>
                     <th>rate</th>
                     <th>fare</th>
                     <th>stereo</th>
@@ -187,6 +188,7 @@
                         <td>{{ $item['size'] }}</td>
                         <td>{{ $item['bag_type'] }}</td>
                         <td>{{ $item['color'] }}</td>
+                        <td>{{ $item['roll_configuration'] ?? '' }}</td>
                         <td>{{ $item['rate'] !== '' && $item['rate'] !== null ? $trimNum($item['rate']) : '' }}
                             ({{ $unit }})
                         </td>
@@ -203,6 +205,7 @@
                     <th>Bag Type</th>
                     <th>Size</th>
                     <th>Color</th>
+                    <th>Roll TYPE</th>
                     <th class="qty">QTY</th>
                 </tr>
             </thead>
@@ -213,20 +216,21 @@
                             <td>{{ $item['bag_type'] }}</td>
                             <td>{{ $bags['bag_size'] }}</td>
                             <td>{{ $bags['bag_color'] }}</td>
+                            <td>{{ $item['roll_configuration'] ?? ($bags['bag_quality'] ?? '') }}</td>
                             <td class="qty">
                                 {{ $lineQty($unit == 'Kg' ? $bags['packing_weight'] : $bags['packing_bag_pieces']) }}
                                 {{ $unit }}</td>
                         </tr>
                     @endforeach
                     <tr class="subtotal">
-                        <td colspan="3"></td>
+                        <td colspan="4"></td>
                         <td class="qty"><b>{{ $trimNum($item['total_unit']) }} {{ $unit }}</b></td>
                     </tr>
                 @endforeach
             </tbody>
             <tfoot>
                 <tr class="grand">
-                    <td colspan="2">Grand Total</td>
+                    <td colspan="3">Grand Total</td>
                     <td class="qty">{{ $unitTable['grand_total']['total'] }}</td>
                     <td class="qty">{{ $trimNum($unitTable['grand_total']['total_unit']) }}</td>
                 </tr>
